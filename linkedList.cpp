@@ -14,38 +14,54 @@ void DELETE(int id, vector<student*>* studentList);
 void PRINT(vector<student*>* studentList);
 
 
-student* ADD(node* &head, node* &newNode, node* &current, node* &next) {//Function to find the new nodes next node
-  student* ns = new student();
-  node* newNode = new node(stu);
-  cout << "Enter first name: " << endl;
-  cin >> ns -> first_name;
-  cout << "Enter last name: " << endl;
-  cin >> ns -> last_name;
-  cout << "Enter ID number: " << endl;
-  cin >> ns -> studentID;
-  cout << "Enter GPA: " << endl;
-  cin >> ns -> gpa;
-  return ns;
-}
-void PRINT(vector<student*>* studentList) {//Prints out all the students
-  vector<student*>::iterator print;
-  for (print = studentList->begin(); print != studentList->end(); print++) {
-    cout << (*print)->first_name << ", ";
-    cout << (*print)->last_name << ", ";
-    cout << (*print)->studentID << ", ";
-    cout << fixed << setprecision(2) << (*print) ->gpa << endl;//Rounds GPA to 2 decimal places and prints(3.40 vs 3.4)
-    cout << endl;
+student* ADD(node* &head, node* &newNode, node* &current, node* &prev) {//Function to find the new nodes next node
+  if (head == null) {//if this is the first node in the list
+    head = newNode;
+    return;
+  }
+  else {
+
+    int id1 = current->getStudent()->getID();
+    int id2 = newNode->getStudent()->getID();
+    int headID = head->getStudent()->getID();
+    int prevID = prev->getStudent()->getID();
+    
+    if (id2 < headID) { //if input node is less than the lowest node(the head node)
+      node tempNode = head;
+      head = newNode;
+      head->setNode(tempNode);
+    }
+    
+    else if ((id2 > prevID) && (id2 < id1)) {//if input node falls in between two nodes
+      prev->setNode(newNode);
+      newNode->setNode(current);
+    }
+    else if (current->getNode() == NULL) {//if recursion reaches the end of the linkedList 
+      cur->setNext(newNode);
+    }
+    else {//recursion with the next node being the current and the current node becomeing the previous
+      add(head, newNode, current->getNode(), current);
+    }
   }
 }
-void DELETE(int id, vector<student*>* studentList) {//Takes in a pointer to the list of student pointers and runs through the list of student pointers until you find the id inputted
-  vector<student*> :: iterator del;
-  for (del = studentList->begin(); del != studentList->end(); del++) {
-    if ((*del)->studentID == id) {
-      cout << "Deleted student ID #: " << id << endl;
-      delete* del;
-      studentList->erase(del);
-      return;
-    }
+void PRINT(node* head) {//Prints out all the students
+  if (head == null) {//empty list
+    cout << "List is Empty!" << endl;
+  }
+  else if (head != NULL && head->getNext() == NULL) {//if the list only has head
+    head->getStudent()->printStudent();
+  }
+  else if (head->getNext() != NULL) {//print student and call print again with the node head connects to
+    head->getStudent()->printStudent();
+    print(head->getNext());
+  }
+}
+void DELETE(node* &head, node* current, node* prev, int ID) {//
+  if (head == NULL) {
+    cout << "List is empty!" << endl;
+  }
+  else if (current == NULL) {
+    cout << "This student isn't a part of the linked list
   }
   //If the ID doesn't exist
   cout << "Invalid ID." << endl;

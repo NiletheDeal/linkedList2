@@ -20,6 +20,8 @@ class student{
   int getID();
   //get GPA
   float getGPA();
+  //print student
+  void printStudent();
  private:
   //Variables
   char* firstName;
