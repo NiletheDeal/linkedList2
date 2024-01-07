@@ -1,7 +1,7 @@
 //Neel Madala
-//1/3/2024
-//Cited from Nathan Zou
-//This program allows the user to input student information(name, Id, GPA) and print out all saved students and delete certain students based on id.
+//1/6/2024
+//Cited from Roger Lee
+//This program allows the user add student information which is stored in a linked list of nodes that can be printed, have certain students deleted and average the GPAs of the students in the list
 #include<iostream>
 #include<vector>
 #include<iomanip>
@@ -9,12 +9,14 @@
 #include "student.h"
 using namespace std;
 
-//Intialize the functions to allow both to be used whenever
-void DELETE(int id, vector<student*>* studentList);
-void PRINT(vector<student*>* studentList);
+//Intialize the functions to be able to use whenever
+void AVERAGE (Node* head, float sumGPA, int totalNode);
+void ADD(node* &head, node* &newNode, node* &current, node* &prev);
+void PRINT(node* head);
+void DELETE(node* &head, node* current, node* prev, int ID);
 
 
-student* ADD(node* &head, node* &newNode, node* &current, node* &prev) {//Function to find the new nodes next node
+void ADD(node* &head, node* &newNode, node* &current, node* &prev) {//Function to find the new nodes next node
   if (head == null) {//if this is the first node in the list
     head = newNode;
     return;
@@ -56,42 +58,83 @@ void PRINT(node* head) {//Prints out all the students
     print(head->getNext());
   }
 }
-void DELETE(node* &head, node* current, node* prev, int ID) {//
-  if (head == NULL) {
+void DELETE(node* &head, node* current, node* prev, int ID) {//Deletes the student if they match the ID given by the user
+  if (head == NULL) {//if no nodes at all
     cout << "List is empty!" << endl;
   }
-  else if (current == NULL) {
-    cout << "This student isn't a part of the linked list
+  else if (current == NULL) {// if no matching ID is found
+    cout << "This student isn't a part of the linked list"
   }
-  //If the ID doesn't exist
-  cout << "Invalid ID." << endl;
+  else if (current->getStudent()->getID() == ID) { //finds a matching ID
+    //matched node is the head and head is the only node
+    if (current == head && head->getNode() == NULL) {//delete the student/node and reset back to default head value
+      head->~node();
+      head = NULL;
+    }
+    //if the matched node is the head node, but the list isn't only the head node
+    else if (current == head) {//deletes current head node and replaces it with the node it pointed to
+      node* tempNode = head->getNode();
+      head->~node();
+      head = tempNode;
+    }
+    //if the node has a node it points to than the previous node points to the node current points to
+    else if (current->getNode() != NULL && current != head) {
+      prev->setNode(current->getNode());
+      current->~node();
+    }
+    //if the node has nothing it points to than the node that points to it now points to nothing
+    else if (current->getNode() == NULL && current != head) {
+      prev->setNode(NULL);
+      current->~node();
+    }
+  }
+  else {//recursion
+    DELETE(head, current->getNode(), current, ID);
+  }
+}
+
+void AVERAGE (Node* head, float sumGPA, int totalNode) {//Average the GPAs of all the students in the list
+  //if the starting node is empty and you haven't go through any iterations of average
+  if (head == NULL && totalNode == 0) {
+    cout << "List is Empty" << endl;
+  }
+  else if (head != NULL) {
+    sumGPA += head->getStudent()->getGPA();
+    totalNode++;
+    average(head->getNode(), sumGPA, totalNode);
+  }
+  else {
+    cout << fixed << setprecision(2) << (sumGPA/totalNode) << endl;
+  }
 }
 
 int main() {
-  char command[6];
+  char command[20];
   bool running = true;
   node* head = NULL; //first node
-  int nodeCount = 0; //Necessary to know if node needs to be added to the end of the list
-  //All to make sure you can edit both each student and the whole list
-  cout << "Welcome to Student List." << endl;
+  //place holders that are used when calling add or delete
+  node* current = head;
+  node* prev = head;
+  cout << "Welcome to LinkList List." << endl;
   while (running == true) {
-    cout << "ADD, PRINT, DELETE, QUIT" << endl;
-    cin >> command;
-    if (command[0] == 'A' && command[1] == 'D' && command[2] == 'D') {//Pushes the user to add a new student to the end of the list
+    cout << "Enter one of the following: ADD, PRINT, DELETE, AVERAGE, or QUIT" << endl;
+    cin.get(command, 20);
+    cin.get();
+    
+    if (strcmp(command, "ADD") == 0) {//Pushes the user to add a new student to the end of the list
       cout << "Adding a new student: " << endl;
-      nodeCount++;
       student* ns = new student();
       node* newNode = new node(ns);
-      node* current = head;
-      node* next = head;
-      add(head, newNode, current, next);
+      add(head, newNode, current, prev);
       
     }
-    else if (command[0] == 'P' && command[1] == 'R' && command[2] == 'I' && command[3] == 'N' && command[4] == 'T') {//Prints out all the students stored in the list
+    
+    else if (strcmp(command, "PRINT") == 0) {//Prints out all the students stored in the list
       cout << "Printing the Student List: " << endl;
-      PRINT(studentList);
+      PRINT(head);
     }
-    else if (command[0] == 'D' && command[1] == 'E' && command[2] == 'L' && command[3] == 'E' && command[4] == 'T' && command[5] == 'E') { //Delete's a student after making sure and from the ID of that student
+    
+    else if (strcmp(command, "DELETE") == 0) { //Delete's a student after making sure and from the ID of that student
       char delCheck;
       cout << "You are about to delete a student. Are you sure? (y/n)";
       cin >> delCheck;
@@ -102,8 +145,8 @@ int main() {
 	  deleteChecking = false;
 	  cout <<"Enter the student ID you want to delete: " << endl;
 	  int IDdel;
-	  cin >> IDdel;//Takes in a studentID
-	  DELETE(IDdel, studentList);
+	  cin >> IDdel;
+	  DELETE(head, current, prev, IDdel);
 	}
 	else if (delCheck == 'n' || delCheck == 'N') {//goes back to main menu if you don't want to delete
 	  cout << "Back to main menu " << endl;
@@ -114,15 +157,22 @@ int main() {
 	}
       }
     }
-    else if (command[0] == 'Q' && command[1] == 'U' && command[2] == 'I' && command[3] == 'T') { //Ends the program
+    
+    else if (strcmp(command, "AVERAGE") == 0) {//Average the GPAs of the students
+      cout << "Averaging the GPAs of all students in the list:" << endl;
+      //Variables required for average function
+      float sumGPA = 0;
+      int totalNode = 0;
+      AVERAGE(head, sumGPA, total);
+    }
+    
+    else if (strcmp(command, "QUIT") == 0) { //Ends the program
       cout << "Quitting program" << endl;
       running = false;
     }
-    else {//invalid input fail safe
-      cout << "Invalid Input. Type a valid Command in Capitals." << endl;
-    }
-
     
-  
+    else {//invalid input fail safe
+      cout << "Invalid Input. Type a valid command in capital letters." << endl;
+    }
   }
 }
