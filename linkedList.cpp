@@ -10,26 +10,28 @@
 using namespace std;
 
 //Intialize the functions to be able to use whenever
-void AVERAGE (Node* head, float sumGPA, int totalNode);
-void ADD(node* &head, node* &newNode, node* &current, node* &prev);
+void AVERAGE (node* head, float sumGPA, int totalNode);
+void ADD(node* &head, node* newNode, node* current, node* prev);
 void PRINT(node* head);
 void DELETE(node* &head, node* current, node* prev, int ID);
 
 
-void ADD(node* &head, node* &newNode, node* &current, node* &prev) {//Function to find the new nodes next node
-  if (head == null) {//if this is the first node in the list
+void ADD(node* &head, node* newNode, node* current, node* prev) {//Function to find the new nodes next node
+  cout << "Placing NOde" << endl;
+  if (head == NULL) {//if this is the first node in the list
+    cout << "test2" << endl;
     head = newNode;
     return;
   }
   else {
-
+    cout << "test1" << endl;
     int id1 = current->getStudent()->getID();
     int id2 = newNode->getStudent()->getID();
     int headID = head->getStudent()->getID();
     int prevID = prev->getStudent()->getID();
     
     if (id2 < headID) { //if input node is less than the lowest node(the head node)
-      node tempNode = head;
+      node* tempNode = head;
       head = newNode;
       head->setNode(tempNode);
     }
@@ -39,23 +41,24 @@ void ADD(node* &head, node* &newNode, node* &current, node* &prev) {//Function t
       newNode->setNode(current);
     }
     else if (current->getNode() == NULL) {//if recursion reaches the end of the linkedList 
-      cur->setNext(newNode);
+      current->setNode(newNode);
     }
     else {//recursion with the next node being the current and the current node becomeing the previous
-      add(head, newNode, current->getNode(), current);
+      
+      ADD(head, newNode, current->getNode(), current);
     }
   }
 }
 void PRINT(node* head) {//Prints out all the students
-  if (head == null) {//empty list
+  if (head == NULL) {//empty list
     cout << "List is Empty!" << endl;
   }
-  else if (head != NULL && head->getNext() == NULL) {//if the list only has head
+  else if (head != NULL && head->getNode() == NULL) {//if the list only has head
     head->getStudent()->printStudent();
   }
-  else if (head->getNext() != NULL) {//print student and call print again with the node head connects to
+  else if (head->getNode() != NULL) {//print student and call print again with the node head connects to
     head->getStudent()->printStudent();
-    print(head->getNext());
+    PRINT(head->getNode());
   }
 }
 void DELETE(node* &head, node* current, node* prev, int ID) {//Deletes the student if they match the ID given by the user
@@ -63,7 +66,7 @@ void DELETE(node* &head, node* current, node* prev, int ID) {//Deletes the stude
     cout << "List is empty!" << endl;
   }
   else if (current == NULL) {// if no matching ID is found
-    cout << "This student isn't a part of the linked list"
+    cout << "This student isn't a part of the linked list" << endl;
   }
   else if (current->getStudent()->getID() == ID) { //finds a matching ID
     //matched node is the head and head is the only node
@@ -93,7 +96,7 @@ void DELETE(node* &head, node* current, node* prev, int ID) {//Deletes the stude
   }
 }
 
-void AVERAGE (Node* head, float sumGPA, int totalNode) {//Average the GPAs of all the students in the list
+void AVERAGE (node* head, float sumGPA, int totalNode) {//Average the GPAs of all the students in the list
   //if the starting node is empty and you haven't go through any iterations of average
   if (head == NULL && totalNode == 0) {
     cout << "List is Empty" << endl;
@@ -101,7 +104,7 @@ void AVERAGE (Node* head, float sumGPA, int totalNode) {//Average the GPAs of al
   else if (head != NULL) {
     sumGPA += head->getStudent()->getGPA();
     totalNode++;
-    average(head->getNode(), sumGPA, totalNode);
+    AVERAGE(head->getNode(), sumGPA, totalNode);
   }
   else {
     cout << fixed << setprecision(2) << (sumGPA/totalNode) << endl;
@@ -113,19 +116,16 @@ int main() {
   bool running = true;
   node* head = NULL; //first node
   //place holders that are used when calling add or delete
-  node* current = head;
-  node* prev = head;
   cout << "Welcome to LinkList List." << endl;
   while (running == true) {
     cout << "Enter one of the following: ADD, PRINT, DELETE, AVERAGE, or QUIT" << endl;
-    cin.get(command, 20);
-    cin.get();
+    cin.getline(command, 20);
     
     if (strcmp(command, "ADD") == 0) {//Pushes the user to add a new student to the end of the list
       cout << "Adding a new student: " << endl;
       student* ns = new student();
       node* newNode = new node(ns);
-      add(head, newNode, current, prev);
+      ADD(head, newNode, head, head);
       
     }
     
@@ -146,7 +146,7 @@ int main() {
 	  cout <<"Enter the student ID you want to delete: " << endl;
 	  int IDdel;
 	  cin >> IDdel;
-	  DELETE(head, current, prev, IDdel);
+	  DELETE(head, head, head, IDdel);
 	}
 	else if (delCheck == 'n' || delCheck == 'N') {//goes back to main menu if you don't want to delete
 	  cout << "Back to main menu " << endl;
@@ -163,7 +163,7 @@ int main() {
       //Variables required for average function
       float sumGPA = 0;
       int totalNode = 0;
-      AVERAGE(head, sumGPA, total);
+      AVERAGE(head, sumGPA, totalNode);
     }
     
     else if (strcmp(command, "QUIT") == 0) { //Ends the program
